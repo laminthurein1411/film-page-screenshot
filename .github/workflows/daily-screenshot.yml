@@ -22,7 +22,7 @@ jobs:
           node-version: "lts/*" # Use the latest LTS version
 
       - name: Install dependencies
-        run: npm install puppeteer imagemin imagemin-pngquant
+        run: npm install puppeteer jpegoptim
 
       - name: Take screenshot
         run: |
@@ -35,7 +35,7 @@ jobs:
             const page = await browser.newPage();
             await page.setViewport({ width: 1920, height: 1080 });
             await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=abusayed', { waitUntil: 'networkidle0' });
-            await page.screenshot({ path: 'film.png', fullPage: false }); // Only visible portion, no scrolling
+            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 80 }); // Save as JPEG with initial quality
             await browser.close();
 
             // Create or update index.html
@@ -93,7 +93,7 @@ jobs:
               <div class='container'>
                 <h1>Letterboxd Last 50 Movies as Poster</h1>
                 <p>Last updated: \${new Date().toUTCString()}</p>
-                <img src='film.png' alt='Daily screenshot of film.sayed.page' width='1920' height='1080'>
+                <img src='film.jpg' alt='Daily screenshot of film.sayed.page'>
                 <div class='source'>
                   <p>Source: <a href='https://sayed.page/letterboxd' target='_blank'>https://sayed.page/letterboxd</a></p>
                   <p>Screenshot dimensions: 1920 x 1080 px</p>
@@ -109,18 +109,8 @@ jobs:
 
       - name: Optimize image size
         run: |
-          npx imagemin film.png --plugin=imagemin-pngquant=quality=65-80 --out-dir=./
-
-      - name: Check image size and re-optimize if necessary
-        run: |
-          MAX_SIZE=350000
-          FILE_SIZE=$(stat -c%s "film.png")
-          if [ "$FILE_SIZE" -gt "$MAX_SIZE" ]; then
-            echo "File is larger than 350KB. Re-optimizing..."
-            npx imagemin film.png --plugin=imagemin-pngquant=quality=50-70 --out-dir=./
-          else
-            echo "File is within the desired size."
-          fi
+          apt-get update && apt-get install -y jpegoptim
+          jpegoptim --max=350000 film.jpg
 
       - name: Commit and push if changed
         run: |
