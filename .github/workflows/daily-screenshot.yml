@@ -22,8 +22,7 @@ jobs:
           node-version: "lts/*" # Use the latest LTS version
 
       - name: Install dependencies
-        run: |
-          npm install puppeteer imagemin imagemin-mozjpeg
+        run: npm install puppeteer
 
       - name: Take screenshot
         run: |
@@ -36,7 +35,7 @@ jobs:
             const page = await browser.newPage();
             await page.setViewport({ width: 1920, height: 1080 });
             await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=abusayed', { waitUntil: 'networkidle0' });
-            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 70 }); // Save as JPEG with initial quality
+            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 70, fullPage: false }); // JPEG format with quality 70
             await browser.close();
 
             // Create or update index.html
@@ -94,7 +93,7 @@ jobs:
               <div class='container'>
                 <h1>Letterboxd Last 50 Movies as Poster</h1>
                 <p>Last updated: \${new Date().toUTCString()}</p>
-                <img src='film.jpg' alt='Daily screenshot of film.sayed.page'>
+                <img src='film.jpg' alt='Daily screenshot of film.sayed.page' width='1920' height='1080'>
                 <div class='source'>
                   <p>Source: <a href='https://sayed.page/letterboxd' target='_blank'>https://sayed.page/letterboxd</a></p>
                   <p>Screenshot dimensions: 1920 x 1080 px</p>
@@ -107,7 +106,6 @@ jobs:
             await fs.writeFile('index.html', html);
           })()
           "
-
 
       - name: Commit and push if changed
         run: |
