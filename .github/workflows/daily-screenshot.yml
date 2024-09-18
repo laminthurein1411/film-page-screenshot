@@ -34,7 +34,7 @@ jobs:
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             await page.setViewport({ width: 1920, height: 1080 });
-            await page.goto('https://film.sayed.page/', { waitUntil: 'networkidle0' });
+            await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=abusayed', { waitUntil: 'networkidle0' });
             await page.screenshot({ path: 'film.png', fullPage: false }); // Only visible portion, no scrolling
             await browser.close();
 
