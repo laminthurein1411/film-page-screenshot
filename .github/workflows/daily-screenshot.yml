@@ -2,67 +2,115 @@ name: Daily Screenshot
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run daily at midnight UTC
-  workflow_dispatch:  # Allow manual trigger
+    - cron: "0 0 * * *" # Run daily at midnight UTC
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   screenshot:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up .gitignore
-      run: |
-        echo 'node_modules/' >> .gitignore
-        echo 'package-lock.json' >> .gitignore
+      - name: Set up .gitignore
+        run: |
+          echo 'node_modules/' >> .gitignore
+          echo 'package-lock.json' >> .gitignore
 
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 'lts/*'  # Use the latest LTS version
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*" # Use the latest LTS version
 
-    - name: Install dependencies
-      run: npm install puppeteer
+      - name: Install dependencies
+        run: npm install puppeteer
 
-    - name: Take screenshot
-      run: |
-        node -e "
-        const puppeteer = require('puppeteer');
-        const fs = require('fs').promises;
+      - name: Take screenshot
+        run: |
+          node -e "
+          const puppeteer = require('puppeteer');
+          const fs = require('fs').promises;
 
-        (async () => {
-          const browser = await puppeteer.launch();
-          const page = await browser.newPage();
-          await page.setViewport({ width: 1920, height: 1080 });
-          await page.goto('https://film.sayed.page/', { waitUntil: 'networkidle0' });
-          await page.screenshot({ path: 'film.png', fullPage: false });
-          await browser.close();
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1920, height: 1080 });
+            await page.goto('https://film.sayed.page/', { waitUntil: 'networkidle0' });
+            await page.screenshot({ path: 'film.png', fullPage: false }); // Only visible portion, no scrolling
+            await browser.close();
 
-          // Create or update index.html
-          const html = \`
-          <!DOCTYPE html>
-          <html lang='en'>
-          <head>
-            <meta charset='UTF-8'>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <title>Daily Screenshot of film.sayed.page</title>
-          </head>
-          <body>
-            <h1>Daily Screenshot of film.sayed.page</h1>
-            <p>Last updated: \${new Date().toUTCString()}</p>
-            <img src='film.png' alt='Daily screenshot of film.sayed.page' style='max-width: 100%;'>
-          </body>
-          </html>
-          \`;
+            // Create or update index.html
+            const html = \`
+            <!DOCTYPE html>
+            <html lang='en'>
+            <head>
+              <meta charset='UTF-8'>
+              <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+              <title>Daily Screenshot of film.sayed.page</title>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  text-align: center;
+                  background-color: #f0f0f0;
+                  color: #333;
+                }
+                .container {
+                  max-width: 800px;
+                  margin: 50px auto;
+                  padding: 20px;
+                  background-color: #fff;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+                h1 {
+                  font-size: 2em;
+                  margin-bottom: 20px;
+                }
+                p {
+                  font-size: 1.2em;
+                  margin-bottom: 20px;
+                }
+                img {
+                  max-width: 100%;
+                  height: auto;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                }
+                .source {
+                  margin-top: 20px;
+                  font-size: 0.9em;
+                  color: #555;
+                }
+                .source a {
+                  color: #007BFF;
+                  text-decoration: none;
+                }
+                .source a:hover {
+                  text-decoration: underline;
+                }
+              </style>
+            </head>
+            <body>
+              <div class='container'>
+                <h1>Daily Screenshot of film.sayed.page</h1>
+                <p>Last updated: \${new Date().toUTCString()}</p>
+                <img src='film.png' alt='Daily screenshot of film.sayed.page' width='1920' height='1080'>
+                <div class='source'>
+                  <p>Source: <a href='https://film.sayed.page/' target='_blank'>https://film.sayed.page/</a></p>
+                  <p>Screenshot dimensions: 1920 x 1080 px</p>
+                </div>
+              </div>
+            </body>
+            </html>
+            \`;
 
-          await fs.writeFile('index.html', html);
-        })()
-        "
+            await fs.writeFile('index.html', html);
+          })()
+          "
 
-    - name: Commit and push if changed
-      run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git add -A
-        git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || exit 0
-        git push
+      - name: Commit and push if changed
+
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add -A
+          git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || exit 0
