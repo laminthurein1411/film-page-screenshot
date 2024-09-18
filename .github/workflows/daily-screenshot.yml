@@ -34,21 +34,21 @@ jobs:
           await browser.close();
 
           // Create or update index.html
-          const html = `
+          const html = \`
           <!DOCTYPE html>
-          <html lang="en">
+          <html lang='en'>
           <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset='UTF-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
             <title>Daily Screenshot of film.sayed.page</title>
           </head>
           <body>
             <h1>Daily Screenshot of film.sayed.page</h1>
-            <p>Last updated: ${new Date().toUTCString()}</p>
-            <img src="film.png" alt="Daily screenshot of film.sayed.page" style="max-width: 100%;">
+            <p>Last updated: \${new Date().toUTCString()}</p>
+            <img src='film.png' alt='Daily screenshot of film.sayed.page' style='max-width: 100%;'>
           </body>
           </html>
-          `;
+          \`;
 
           await fs.writeFile('index.html', html);
         })()
