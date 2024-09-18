@@ -1,0 +1,63 @@
+name: Daily Screenshot
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install puppeteer
+
+    - name: Take screenshot
+      run: |
+        node -e "
+        const puppeteer = require('puppeteer');
+        const fs = require('fs').promises;
+
+        (async () => {
+          const browser = await puppeteer.launch();
+          const page = await browser.newPage();
+          await page.setViewport({ width: 1920, height: 1080 });
+          await page.goto('https://film.sayed.page/', { waitUntil: 'networkidle0' });
+          await page.screenshot({ path: 'film.png', fullPage: false });
+          await browser.close();
+
+          // Create or update index.html
+          const html = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Daily Screenshot of film.sayed.page</title>
+          </head>
+          <body>
+            <h1>Daily Screenshot of film.sayed.page</h1>
+            <p>Last updated: ${new Date().toUTCString()}</p>
+            <img src="film.png" alt="Daily screenshot of film.sayed.page" style="max-width: 100%;">
+          </body>
+          </html>
+          `;
+
+          await fs.writeFile('index.html', html);
+        })()
+        "
+
+    - name: Commit and push if changed
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add -A
+        git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || exit 0
+        git push
