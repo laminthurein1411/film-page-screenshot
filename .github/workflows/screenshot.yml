@@ -1,0 +1,77 @@
+name: Generate Screenshot Every 3 Days
+
+on:
+  schedule:
+    - cron: "0 0 */3 * *" # Run every 3 days at midnight UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*" # Use the latest LTS version
+
+      - name: Install dependencies
+        run: npm install puppeteer
+
+      - name: Take screenshot
+        run: |
+          node -e "
+          const puppeteer = require('puppeteer');
+          const fs = require('fs').promises;
+
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1920, height: 1080 });
+            await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=abusayed', { waitUntil: 'networkidle0' });
+            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 70, fullPage: false });
+            await browser.close();
+
+            const stats = await fs.stat('film.jpg');
+            console.log('Image file size:', stats.size, 'bytes');
+            if (stats.size === 0) {
+              throw new Error('Image file is empty');
+            }
+          })()
+          "
+
+      - name: Upload screenshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot
+          path: film.jpg
+
+      - name: Download screenshot artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: screenshot
+
+      - name: Move screenshot to root
+        run: mv film.jpg .
+
+      - name: Debug - List files
+        run: ls -la
+
+      - name: Debug - Check file sizes
+        run: du -h film.jpg
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add film.jpg
+          git status
+          git diff --staged --name-status
+          git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || exit 0
+          git push origin main
+
+      - name: Debug - Check git log
+        run: git log -1 --stat
