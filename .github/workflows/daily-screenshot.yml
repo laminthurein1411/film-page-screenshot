@@ -9,7 +9,7 @@ jobs:
   screenshot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Fetch all history for all branches and tags
 
@@ -108,19 +108,19 @@ jobs:
           "
 
       - name: Upload screenshot
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: screenshot
           path: film.jpg
 
       - name: Upload index.html
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: index
           path: index.html
 
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
 
       - name: Debug - List files
         run: ls -la
