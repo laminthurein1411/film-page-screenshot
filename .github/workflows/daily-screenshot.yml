@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
 
       - name: Set up .gitignore
         run: |
@@ -110,13 +112,15 @@ jobs:
       - name: Debug - Check file sizes
         run: du -h film.jpg index.html
 
-      - name: Commit and push if changed
+      - name: Commit and push changes
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add -f film.jpg index.html
           git status
           git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || exit 0
+          git fetch origin main
+          git rebase origin/main
           git push origin main
 
       - name: Debug - Check git log
