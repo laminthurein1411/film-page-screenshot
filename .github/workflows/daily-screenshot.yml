@@ -1,8 +1,8 @@
-name: Daily Screenshot
+name: Generate Screenshot Every 3 Days
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Run daily at midnight UTC
+    - cron: "0 0 */3 * *" # Run every 3 days at midnight UTC
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -12,11 +12,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Fetch all history for all branches and tags
-
-      - name: Set up .gitignore
-        run: |
-          echo 'node_modules/' >> .gitignore
-          echo 'package-lock.json' >> .gitignore
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -103,6 +98,13 @@ jobs:
             </html>\`;
 
             await fs.writeFile('index.html', html);
+            
+            // Verify image creation
+            const stats = await fs.stat('film.jpg');
+            console.log('Image file size:', stats.size, 'bytes');
+            if (stats.size === 0) {
+              throw new Error('Image file is empty');
+            }
           })()
           "
 
@@ -116,8 +118,9 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git add -A  # Stage all changes, including .gitignore
+          git add -A
           git status
+          git diff --staged --name-status
           git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || exit 0
           git fetch origin main
           git rebase origin/main
