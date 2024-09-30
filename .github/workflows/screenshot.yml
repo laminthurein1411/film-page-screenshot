@@ -2,8 +2,8 @@ name: Generate Screenshot Every 3 Days
 
 on:
   schedule:
-    - cron: "0 0 */3 * *" # Run every 3 days at midnight UTC
-  workflow_dispatch: # Allow manual trigger
+    - cron: "0 0 */3 * *"  # Run every 3 days at midnight UTC
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   screenshot:
@@ -16,14 +16,10 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "lts/*" # Use the latest LTS version
+          node-version: "lts/*"  # Use the latest LTS version
 
       - name: Install dependencies
         run: npm install puppeteer
-
-      - name: Remove old screenshot
-        run: |
-          rm -f film.jpg  # Remove any existing file to avoid conflicts
 
       - name: Create screenshot script
         run: |
@@ -48,34 +44,11 @@ jobs:
       - name: Run screenshot script
         run: node screenshot.js
 
-      - name: Upload screenshot artifact
+      - name: Upload screenshot as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: screenshot
+          name: film-screenshot
           path: film.jpg
 
-      - name: Download screenshot artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: screenshot
-
-      - name: Debug - List files
-        run: ls -la
-
-      - name: Debug - Check file sizes
-        run: du -h film.jpg
-
-      - name: Force commit and push changes
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add --force film.jpg  # Force add the new screenshot
-          git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || echo "No changes to commit"
-          git push origin main
-
-      - name: Remove temporary files (Optional)
-        run: |
-          rm screenshot.js  # Clean up untracked file if not needed anymore
-
-      - name: Debug - Check git log
-        run: git log -1 --stat
+      - name: Clean up temporary files
+        run: rm screenshot.js
