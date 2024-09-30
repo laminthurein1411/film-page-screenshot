@@ -54,9 +54,6 @@ jobs:
         with:
           name: screenshot
 
-      - name: Move screenshot to root
-        run: mv film.jpg .
-
       - name: Debug - List files
         run: ls -la
 
