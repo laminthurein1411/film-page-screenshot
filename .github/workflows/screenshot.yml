@@ -1,4 +1,4 @@
-name: Generate Screenshot Every 3 Days
+name: Generate and Upload Screenshot
 
 on:
   schedule:
@@ -10,13 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
 
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "lts/*"  # Use the latest LTS version
+          node-version: "lts/*"
 
       - name: Install dependencies
         run: npm install puppeteer
@@ -31,7 +29,7 @@ jobs:
             const page = await browser.newPage();
             await page.setViewport({ width: 1920, height: 1080 });
             await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=abusayed', { waitUntil: 'networkidle0' });
-            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 70, fullPage: false });
+            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 70 });
             await browser.close();
 
             const stats = await fs.stat('film.jpg');
@@ -44,11 +42,14 @@ jobs:
       - name: Run screenshot script
         run: node screenshot.js
 
-      - name: Upload screenshot as artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload screenshot as release asset
+        uses: softprops/action-gh-release@v1
         with:
-          name: film-screenshot
-          path: film.jpg
+          tag_name: 'latest'  # You can also use a dynamic tag based on the date or version
+          release_name: 'Film Screenshot - $(date +'%Y-%m-%d')'
+          files: film.jpg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clean up temporary files
         run: rm screenshot.js
