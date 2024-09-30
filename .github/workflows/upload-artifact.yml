@@ -1,8 +1,8 @@
-name: Upload Screenshot to Repository
+name: Commit Screenshot to Repository
 
 on:
   workflow_run:
-    workflows: ["Generate Screenshot Every 3 Days"]  # Specify the name of the screenshot workflow
+    workflows: ["Generate and Upload Screenshot"]  # Specify the name of the first workflow
     types:
       - completed
 
@@ -10,20 +10,21 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
-      - name: Download screenshot artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: film-screenshot
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download the latest release asset
+        id: download_asset
+        run: |
+          # Get the latest release asset URL for film.jpg
+          RELEASE_DATA=$(curl -s "https://api.github.com/repos/abusayed0206/film-page-screenshot/releases/latest")
+          ASSET_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name=="film.jpg") | .url')
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o film.jpg $ASSET_URL
 
       - name: Configure Git
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-
-      - name: Replace old screenshot
-        run: |
-          mv film.jpg film.jpg.old || echo "No old screenshot to replace"
-          mv film.jpg film.jpg
 
       - name: Commit and push changes
         run: |
