@@ -1,0 +1,32 @@
+name: Upload Screenshot to Repository
+
+on:
+  workflow_run:
+    workflows: ["Generate Screenshot Every 3 Days"]  # Specify the name of the screenshot workflow
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download screenshot artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: film-screenshot
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Replace old screenshot
+        run: |
+          mv film.jpg film.jpg.old || echo "No old screenshot to replace"
+          mv film.jpg film.jpg
+
+      - name: Commit and push changes
+        run: |
+          git add film.jpg
+          git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push origin main
