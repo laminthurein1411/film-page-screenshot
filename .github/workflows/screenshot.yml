@@ -27,10 +27,9 @@ jobs:
             rm film.jpg
           fi
 
-      - name: Take new screenshot
+      - name: Create screenshot script
         run: |
-          node -e "
-          const puppeteer = require('puppeteer');
+          echo "const puppeteer = require('puppeteer');
           const fs = require('fs').promises;
 
           (async () => {
@@ -46,7 +45,10 @@ jobs:
             if (stats.size === 0) {
               throw new Error('Image file is empty');
             }
-          })()
+          })();" > screenshot.js
+
+      - name: Run screenshot script
+        run: node screenshot.js
 
       - name: Upload screenshot artifact
         uses: actions/upload-artifact@v4
