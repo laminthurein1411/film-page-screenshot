@@ -23,9 +23,7 @@ jobs:
 
       - name: Remove old screenshot
         run: |
-          if [ -f "film.jpg" ]; then
-            rm film.jpg
-          fi
+          rm -f film.jpg  # Remove any existing file to avoid conflicts
 
       - name: Create screenshot script
         run: |
@@ -71,9 +69,13 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git add --force film.jpg  # Ensure film.jpg is added even if previously ignored or untracked
+          git add --force film.jpg  # Force add the new screenshot
           git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || echo "No changes to commit"
           git push origin main
+
+      - name: Remove temporary files (Optional)
+        run: |
+          rm screenshot.js  # Clean up untracked file if not needed anymore
 
       - name: Debug - Check git log
         run: git log -1 --stat
