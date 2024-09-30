@@ -35,6 +35,12 @@ jobs:
             await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 70, fullPage: false });
             await browser.close();
 
+            const stats = await fs.stat('film.jpg');
+            console.log('Image file size:', stats.size, 'bytes');
+            if (stats.size === 0) {
+              throw new Error('Image file is empty');
+            }
+
             const html = \`<!DOCTYPE html>
             <html lang='en'>
             <head>
@@ -98,32 +104,40 @@ jobs:
             </html>\`;
 
             await fs.writeFile('index.html', html);
-            
-            // Verify image creation
-            const stats = await fs.stat('film.jpg');
-            console.log('Image file size:', stats.size, 'bytes');
-            if (stats.size === 0) {
-              throw new Error('Image file is empty');
-            }
           })()
           "
+
+      - name: Upload screenshot
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshot
+          path: film.jpg
+
+      - name: Upload index.html
+        uses: actions/upload-artifact@v2
+        with:
+          name: index
+          path: index.html
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
 
       - name: Debug - List files
         run: ls -la
 
       - name: Debug - Check file sizes
-        run: du -h film.jpg index.html
+        run: du -h screenshot/film.jpg index/index.html
 
       - name: Commit and push changes
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git add -A
+          cp screenshot/film.jpg .
+          cp index/index.html .
+          git add film.jpg index.html
           git status
           git diff --staged --name-status
           git commit -m "Update screenshot for $(date +'%Y-%m-%d')" || exit 0
-          git fetch origin main
-          git rebase origin/main
           git push origin main
 
       - name: Debug - Check git log
