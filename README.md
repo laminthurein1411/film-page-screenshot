@@ -1,11 +1,68 @@
 ## Letterboxd Poster 🎬
 
-This project fetches Letterboxd RSS feeds, processes them through a worker, and returns the result as a webpage.
+This project fetches Letterboxd RSS feeds, processes them through a Cloudflare Worker, and returns the result as a poster-style webpage and image.
 
-Initially, I tried using Cloudflare Browser Rendering, but it requires a paid plan 💸. I also faced issues with Cloudflare's forked Puppeteer on their free worker—either it wasn’t working correctly or I couldn’t get it to function properly 🤷‍♂️.
+---
 
-Instead, I use GitHub Actions with Puppeteer to capture a screenshot of the Letterboxd poster and push it to the GitHub repository once a day 📸. This process takes approximately 1 to 2 minutes of build time daily, totaling around 60 to 70 minutes per month 🕒.
+### Motivation & Challenges
 
-Cloudflare Pages then deploys the screenshot automatically and serves it at: [https://letterboxdlrs.pages.dev/film.jpg](https://letterboxdlrs.pages.dev/film.jpg) 🌐.
+- **Cloudflare Browser Rendering:**  
+  My initial approach involved using Cloudflare Browser Rendering, but it requires a paid plan 💸.
+- **Cloudflare Worker Puppeteer:**  
+  I also tried Cloudflare's forked Puppeteer on their free worker tier, but it was either broken or I couldn’t get it working 🤷‍♂️.
 
-While you can use GitHub Pages for hosting, Cloudflare offers better performance from their edge servers 🚀.
+---
+
+### How It Works
+
+1. **Automated Screenshot:**  
+   A [GitHub Actions](.github/workflows/screenshot.yml) workflow uses Puppeteer to capture a screenshot of the Letterboxd poster webpage once a day.
+
+2. **Automatic Push:**  
+   The screenshot (`film.jpg`) and `index.html` are committed and pushed to this repository by the workflow.
+
+3. **Instant Static Deployment:**  
+   [Cloudflare Pages](https://pages.cloudflare.com/) watches this repo and instantly updates the hosted site and image on every push.
+
+---
+
+### 🚀 Live Demo
+
+- **Poster image:**  
+  ![Daily Letterboxd Poster](https://letterboxdlrs.pages.dev/film.jpg)
+
+- **Webpage with context:**  
+  [https://letterboxdlrs.pages.dev/](https://letterboxdlrs.pages.dev/)
+
+---
+
+### ⚙️ Technology Stack
+
+- **GitHub Actions:** Automates the daily screenshot and git push.
+- **Puppeteer:** Headless browser for rendering and capturing screenshots.
+- **Cloudflare Pages:** Deploys and serves the static site and image from the edge for fast global access.
+
+---
+
+### ⏱️ Efficiency
+
+- **Build Time:** Each GitHub Actions run takes ~1–2 minutes per day (≈ 60–70 min/month).
+- **Hosting:** Using Cloudflare Pages for low-latency, edge-cached static hosting.  
+  *(GitHub Pages is also supported, but Cloudflare offers better global performance.)*
+
+---
+
+### 📂 Files
+
+- `film.jpg` — The latest screenshot, updated daily.
+- `index.html` — Webpage displaying the screenshot with metadata.
+- `.github/workflows/screenshot.yml` — Automation workflow.
+- `package.json` — Puppeteer dependency.
+
+---
+
+### 📜 License
+
+MIT License © 2024 [MD. ABU SAYED](https://github.com/abusayed0206)
+
+---
