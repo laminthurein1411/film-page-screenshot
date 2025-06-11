@@ -1,9 +1,9 @@
-name: Generate and Upload Screenshot
+name: Generate, Commit, and Publish Screenshot
 
 on:
   schedule:
-    - cron: "0 0 */3 * *"  # Run every 3 days at midnight UTC
-  workflow_dispatch:  # Allow manual trigger
+    - cron: "0 0 * * *"  # Run daily at midnight UTC
+  workflow_dispatch:
 
 jobs:
   screenshot:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Use Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
@@ -19,37 +19,36 @@ jobs:
       - name: Install dependencies
         run: npm install puppeteer
 
-      - name: Create screenshot script
+      - name: Capture screenshot using Puppeteer
         run: |
           echo "const puppeteer = require('puppeteer');
-          const fs = require('fs').promises;
-
           (async () => {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             await page.setViewport({ width: 1920, height: 1080 });
             await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=abusayed', { waitUntil: 'networkidle0' });
-            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 70 });
+            await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 100 });
             await browser.close();
-
-            const stats = await fs.stat('film.jpg');
-            console.log('Image file size:', stats.size, 'bytes');
-            if (stats.size === 0) {
-              throw new Error('Image file is empty');
-            }
           })();" > screenshot.js
+          node screenshot.js
 
-      - name: Run screenshot script
-        run: node screenshot.js
+      - name: Update index.html date
+        run: |
+          # Get RFC 1123 UTC date
+          DATE="$(date -u +"%a, %d %b %Y %H:%M:%S GMT")"
+          # Use sed for in-place replacement of the date in index.html
+          sed -i -E "s|Last updated: .* GMT|Last updated: $DATE|g" index.html
 
-      - name: Upload screenshot as release asset
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: 'latest'  # You can also use a dynamic tag based on the date or version
-          release_name: 'Film Screenshot - $(date +'%Y-%m-%d')'
-          files: film.jpg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
-      - name: Clean up temporary files
-        run: rm screenshot.js
+      - name: Commit and push screenshot and index.html
+        run: |
+          git add film.jpg index.html
+          git commit -m "Update screenshot and timestamp on $(date -u '+%Y-%m-%d')" || echo "No changes to commit"
+          git push
+
+      - name: Clean up
+        run: rm -f screenshot.js
