@@ -52,6 +52,11 @@ This project fetches Letterboxd RSS feeds, processes them through a Cloudflare W
 
 ---
 
+### 🙏 Achknowledgement
+
+- This project is solely based on [letterboxd-diary-embe](https://github.com/timciep/letterboxd-diary-embed)
+- Worker to poster-style webpage avaiable [here](https://github.com/abusayed0206/letterboxd-diary-embed)
+
 ### 📂 Files
 
 - `film.jpg` — The latest screenshot, updated daily.
