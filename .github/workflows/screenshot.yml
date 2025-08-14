@@ -28,7 +28,7 @@ jobs:
             });
             const page = await browser.newPage();
             await page.setViewport({ width: 1920, height: 1080 });
-            await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=abusayed', { waitUntil: 'networkidle0' });
+            await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=laminthurein', { waitUntil: 'networkidle0' });
             await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 100 });
             await browser.close();
           })();" > screenshot.js
