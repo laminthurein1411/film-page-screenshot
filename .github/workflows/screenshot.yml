@@ -27,7 +27,7 @@ jobs:
               args: ['--no-sandbox', '--disable-setuid-sandbox']
             });
             const page = await browser.newPage();
-            await page.setViewport({ width: 1080, height: 1920 });
+            await page.setViewport({ width: 500, height: 900 });
             await page.goto('https://lb-embed-content.bokonon.dev?username=laminthurein', { waitUntil: 'networkidle0' });
             await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 100 });
             await browser.close();
