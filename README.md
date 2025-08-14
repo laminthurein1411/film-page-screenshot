@@ -54,7 +54,7 @@ This project fetches Letterboxd RSS feeds, processes them through a Cloudflare W
 
 ### 🙏 Achknowledgement
 
-- This project is solely based on [letterboxd-diary-embe](https://github.com/timciep/letterboxd-diary-embed)
+- This project is solely based on (letterboxd-diary-embe](https://github.com/timciep/letterboxd-diary-embed)
 - Worker to poster-style webpage avaiable [here](https://github.com/abusayed0206/letterboxd-diary-embed)
 
 ### 📂 Files
@@ -65,7 +65,9 @@ This project fetches Letterboxd RSS feeds, processes them through a Cloudflare W
 - `package.json` — Puppeteer dependency.
 
 ---
-
+### Credit to
+ [©️timciep](https://github.com/timciep/letterboxd-diary-embed) and [©️abusayed0206](https://github.com/abusayed0206/film-page-screenshot)
+ 
 ### 📜 License
 
 MIT License © 2024 [MD. ABU SAYED](https://github.com/abusayed0206)
