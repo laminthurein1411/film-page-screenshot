@@ -29,7 +29,7 @@ This project fetches Letterboxd RSS feeds, processes them through a Cloudflare W
 ### 🚀 Live Demo
 
 - **Poster image:**  
-  ![Daily Letterboxd Poster](https://letterboxdlrs.pages.dev/film.jpg)
+  ![Daily Letterboxd Poster](https://github.com/laminthurein1411/film-page-screenshot/blob/main/film.jpg)
 
 - **Webpage with context:**  
   [https://letterboxdlrs.pages.dev/](https://letterboxdlrs.pages.dev/)
