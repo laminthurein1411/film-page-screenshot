@@ -27,8 +27,8 @@ jobs:
               args: ['--no-sandbox', '--disable-setuid-sandbox']
             });
             const page = await browser.newPage();
-            await page.setViewport({ width: 1920, height: 1080 });
-            await page.goto('https://letterboxd-embed.lrsayed.workers.dev/?username=laminthurein', { waitUntil: 'networkidle0' });
+            await page.setViewport({ width: 1080, height: 1920 });
+            await page.goto('https://lb-embed-content.bokonon.dev?username=laminthurein', { waitUntil: 'networkidle0' });
             await page.screenshot({ path: 'film.jpg', type: 'jpeg', quality: 100 });
             await browser.close();
           })();" > screenshot.js
